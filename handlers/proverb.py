@@ -6,6 +6,7 @@ from aiogram.filters import Command
 
 from services.database import Database
 from services.ai_matcher import AIMatcher
+from config import Config
 
 router = Router()
 
@@ -16,7 +17,7 @@ def load_proverbs(proverbs_path: str) -> dict:
 
 
 @router.message(Command("proverb"))
-async def cmd_random_proverb(message: Message, db: Database, config):
+async def cmd_random_proverb(message: Message, db: Database, config: Config):
     data = load_proverbs(config.PROVERBS_PATH)
     proverbs = data["proverbs"]
     proverb = random.choice(proverbs)
@@ -34,7 +35,7 @@ async def cmd_random_proverb(message: Message, db: Database, config):
 
 
 @router.message(Command("daily"))
-async def cmd_daily(message: Message, db: Database, config):
+async def cmd_daily(message: Message, db: Database, config: Config):
     from datetime import date
     today = date.today().isoformat()
 
@@ -72,7 +73,7 @@ async def add_favorite(callback: CallbackQuery, db: Database):
 
 
 @router.message(F.text & ~F.text.startswith("/"))
-async def match_proverb(message: Message, db: Database, config, ai_matcher: AIMatcher):
+async def match_proverb(message: Message, db: Database, config: Config, ai_matcher: AIMatcher):
     data = load_proverbs(config.PROVERBS_PATH)
     proverbs = data["proverbs"]
 

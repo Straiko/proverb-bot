@@ -3,12 +3,13 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
 from services.database import Database
+from config import Config
 
 router = Router()
 
 
 @router.message(Command("favorites"))
-async def cmd_favorites(message: Message, db: Database):
+async def cmd_favorites(message: Message, db: Database, config: Config):
     favorites = await db.get_favorites(message.from_user.id)
 
     if not favorites:
@@ -27,7 +28,7 @@ async def cmd_favorites(message: Message, db: Database):
 
 
 @router.callback_query(F.data.startswith("fav_remove_"))
-async def remove_favorite(callback: CallbackQuery, db: Database):
+async def remove_favorite(callback: CallbackQuery, db: Database, config: Config):
     proverb_id = int(callback.data.split("_")[2])
     await db.remove_favorite(callback.from_user.id, proverb_id)
     await callback.answer("❌ Удалено из избранного")

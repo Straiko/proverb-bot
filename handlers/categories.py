@@ -3,16 +3,18 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
+from config import Config
+
 router = Router()
 
 
-def load_proverbs(proverbs_path: str = "data/proverbs.json") -> dict:
+def load_proverbs(proverbs_path: str) -> dict:
     with open(proverbs_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 @router.message(Command("categories"))
-async def cmd_categories(message: Message, config):
+async def cmd_categories(message: Message, config: Config):
     data = load_proverbs(config.PROVERBS_PATH)
     categories = data["categories"]
 
@@ -27,7 +29,7 @@ async def cmd_categories(message: Message, config):
 
 
 @router.callback_query(F.data.startswith("cat_"))
-async def show_category(callback: CallbackQuery, config):
+async def show_category(callback: CallbackQuery, config: Config):
     category_id = int(callback.data.split("_")[1])
     data = load_proverbs(config.PROVERBS_PATH)
 
@@ -51,7 +53,7 @@ async def show_category(callback: CallbackQuery, config):
 
 
 @router.message(Command("category"))
-async def cmd_category(message: Message, config):
+async def cmd_category(message: Message, config: Config):
     data = load_proverbs(config.PROVERBS_PATH)
     categories = data["categories"]
 
