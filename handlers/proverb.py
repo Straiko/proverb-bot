@@ -1,27 +1,23 @@
 import json
 import random
-from pathlib import Path
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
 from services.database import Database
 from services.ai_matcher import AIMatcher
-from config import Config
 
 router = Router()
 
-DATA_DIR = Path(__file__).parent.parent / "data"
 
-
-def load_proverbs() -> dict:
-    with open(DATA_DIR / "proverbs.json", "r", encoding="utf-8") as f:
+def load_proverbs(proverbs_path: str) -> dict:
+    with open(proverbs_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 @router.message(Command("proverb"))
-async def cmd_random_proverb(message: Message, db: Database, config: Config):
-    data = load_proverbs()
+async def cmd_random_proverb(message: Message, db: Database, config):
+    data = load_proverbs(config.PROVERBS_PATH)
     proverbs = data["proverbs"]
     proverb = random.choice(proverbs)
 
@@ -38,19 +34,19 @@ async def cmd_random_proverb(message: Message, db: Database, config: Config):
 
 
 @router.message(Command("daily"))
-async def cmd_daily(message: Message, db: Database, config: Config):
+async def cmd_daily(message: Message, db: Database, config):
     from datetime import date
     today = date.today().isoformat()
 
     daily_id = await db.get_daily_proverb_id(today)
     if daily_id:
-        data = load_proverbs()
+        data = load_proverbs(config.PROVERBS_PATH)
         proverb = next((p for p in data["proverbs"] if p["id"] == daily_id), None)
         if proverb:
             await message.answer(f"📅 Пословица дня:\n\n📜 {proverb['text']}")
             return
 
-    data = load_proverbs()
+    data = load_proverbs(config.PROVERBS_PATH)
     proverbs = data["proverbs"]
     proverb = random.choice(proverbs)
 
@@ -76,8 +72,8 @@ async def add_favorite(callback: CallbackQuery, db: Database):
 
 
 @router.message(F.text & ~F.text.startswith("/"))
-async def match_proverb(message: Message, db: Database, config: Config, ai_matcher: AIMatcher):
-    data = load_proverbs()
+async def match_proverb(message: Message, db: Database, config, ai_matcher: AIMatcher):
+    data = load_proverbs(config.PROVERBS_PATH)
     proverbs = data["proverbs"]
 
     matched_text = ai_matcher.match_proverb(message.text, proverbs)

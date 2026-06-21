@@ -1,22 +1,19 @@
 import json
-from pathlib import Path
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
 router = Router()
 
-DATA_DIR = Path(__file__).parent.parent / "data"
 
-
-def load_proverbs() -> dict:
-    with open(DATA_DIR / "proverbs.json", "r", encoding="utf-8") as f:
+def load_proverbs(proverbs_path: str = "data/proverbs.json") -> dict:
+    with open(proverbs_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 @router.message(Command("categories"))
-async def cmd_categories(message: Message):
-    data = load_proverbs()
+async def cmd_categories(message: Message, config):
+    data = load_proverbs(config.PROVERBS_PATH)
     categories = data["categories"]
 
     text = "📂 Категории пословиц:\n\n"
@@ -30,9 +27,9 @@ async def cmd_categories(message: Message):
 
 
 @router.callback_query(F.data.startswith("cat_"))
-async def show_category(callback: CallbackQuery):
+async def show_category(callback: CallbackQuery, config):
     category_id = int(callback.data.split("_")[1])
-    data = load_proverbs()
+    data = load_proverbs(config.PROVERBS_PATH)
 
     category = next((c for c in data["categories"] if c["id"] == category_id), None)
     proverbs = [p for p in data["proverbs"] if p["category_id"] == category_id]
@@ -54,8 +51,8 @@ async def show_category(callback: CallbackQuery):
 
 
 @router.message(Command("category"))
-async def cmd_category(message: Message):
-    data = load_proverbs()
+async def cmd_category(message: Message, config):
+    data = load_proverbs(config.PROVERBS_PATH)
     categories = data["categories"]
 
     buttons = []
