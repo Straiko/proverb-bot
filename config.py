@@ -16,7 +16,7 @@ class Config:
     GROQ_API_KEY: str
     GROQ_MODEL: str = "llama-3.1-8b-instant"
     DB_PATH: str = str(DATA_DIR / "bot.db")
-    PROVERBS_PATH: str = str(DATA_DIR / "proverbs.json")
+    PROVERBS_PATH: str = str(DATA_DIR / "proverbs_all.json")
 
 
 def load_config() -> Config:
