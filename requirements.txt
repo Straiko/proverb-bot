@@ -3,3 +3,4 @@ aiohttp
 aiosqlite
 beautifulsoup4
 groq
+python-dotenv
