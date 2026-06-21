@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
 from config import Config
+from handlers.proverb import CATEGORIES, PROVERBS
 
 router = Router()
 
@@ -13,8 +14,7 @@ def load_proverbs(proverbs_path: str) -> dict:
         with open(proverbs_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        from handlers.proverb import get_builtin_proverbs
-        return get_builtin_proverbs()
+        return {"categories": CATEGORIES, "proverbs": PROVERBS}
 
 
 @router.message(Command("categories"))
@@ -22,14 +22,11 @@ async def cmd_categories(message: Message, config: Config):
     data = load_proverbs(config.PROVERBS_PATH)
     categories = data["categories"]
 
-    text = "📂 Категории пословиц:\n\n"
     buttons = []
-
     for cat in categories:
-        text += f"{cat['emoji']} {cat['name']}\n"
         buttons.append([{"text": f"{cat['emoji']} {cat['name']}", "callback_data": f"cat_{cat['id']}"}])
 
-    await message.answer(text, reply_markup={"inline_keyboard": buttons})
+    await message.answer("📂 Категории пословиц:", reply_markup={"inline_keyboard": buttons})
 
 
 @router.callback_query(F.data.startswith("cat_"))
