@@ -13,7 +13,8 @@ def load_proverbs(proverbs_path: str) -> dict:
         with open(proverbs_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        return {"categories": [], "proverbs": []}
+        from handlers.proverb import get_builtin_proverbs
+        return get_builtin_proverbs()
 
 
 @router.message(Command("categories"))
