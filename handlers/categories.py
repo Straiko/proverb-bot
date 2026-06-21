@@ -9,8 +9,11 @@ router = Router()
 
 
 def load_proverbs(proverbs_path: str) -> dict:
-    with open(proverbs_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(proverbs_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"categories": [], "proverbs": []}
 
 
 @router.message(Command("categories"))
